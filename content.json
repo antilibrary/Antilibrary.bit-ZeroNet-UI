@@ -1,0 +1,74 @@
+{
+ "address": "147nKEb9bBJgBDgQytEQhmiGjF8e6HkEua",
+ "description": "Your unread books",
+ "domain": "Antilibrary.bit",
+ "files": {
+  "css/all.css": {
+   "sha512": "bac6c2100f172a42275900a986f24bba5099373558cfd34190ae49501e432451",
+   "size": 571167
+  },
+  "dbschema.json": {
+   "sha512": "c6908cc03314ec3e3e40812f064870789adf45404124830ca1b831c40b97da31",
+   "size": 2532
+  },
+  "images/antilibrary.png": {
+   "sha512": "69b70b2246790685f4de5ebc897c2b7512bd8bd69560556f8d97a104bf065630",
+   "size": 10101
+  },
+  "images/de.png": {
+   "sha512": "5bfbe453e635ede38a7e495badb349a2ebaa152a794d26d5b69b657f8e8fd518",
+   "size": 545
+  },
+  "images/en.png": {
+   "sha512": "c1d2d29e2c185915a14fd1dca386ae3c71741003a726e8236fea197c9999f60b",
+   "size": 599
+  },
+  "images/fr.png": {
+   "sha512": "c00e202e083f703e39cafbb86f3e3f6b330359906e3a6c7a6a78364d6adeb489",
+   "size": 545
+  },
+  "images/it.png": {
+   "sha512": "0f3feaa63385520f2565c7aed0d6d7a0b6f66b78fb6c8845a026199c37570791",
+   "size": 420
+  },
+  "images/nocover.png": {
+   "sha512": "0d36360455c93ee36d90b6a55d802a1c5adab78e0531f31dc8af9cf13b57751e",
+   "size": 926
+  },
+  "images/pt.png": {
+   "sha512": "7245213a9d1468d18a75cd96d91e7b8b602374902c2a852dbfc9d5d6e341d618",
+   "size": 593
+  },
+  "images/sp.png": {
+   "sha512": "6170bc86ff2076a7211161eeb09cf950da548c5e6c6a354054319ceb1f706e74",
+   "size": 469
+  },
+  "images/zh.png": {
+   "sha512": "be801e5bbd51f6edb324dcd5b19239c64e011bb559e976875b2bcfe71b6a6eb1",
+   "size": 472
+  },
+  "index.html": {
+   "sha512": "268469c9b20bb7a9af36510638b3f2f1ba4607b32fb074b3c204d0d8a5367f38",
+   "size": 23598
+  },
+  "js/all.js": {
+   "sha512": "cd25b5fe696be9b949a90b83b527ffdcb8412b8aa1d7c979140deb7af2529b32",
+   "size": 350651
+  },
+  "readme.md": {
+   "sha512": "6493b04860e0fefd9570c1d1d863e86f9ee0dfb908e383672801db27d3dbab88",
+   "size": 74
+  }
+ },
+ "ignore": "((js|css)/(?!all.(js|css))|.git|.idea|backend|merged-Antilibrary)",
+ "inner_path": "content.json",
+ "modified": 1502040243,
+ "postmessage_nonce_security": true,
+ "signers_sign": "HJoc4uYl90bwNgKFDWEfxWw1ZKRKEFCuHZfE+H6YGiElG66QzJwK94mM3uZGQvqh4Bmtal9bhRtiSHYdx3UU2e0=",
+ "signs": {
+  "147nKEb9bBJgBDgQytEQhmiGjF8e6HkEua": "G6yk7zY8biAbA3tbNpRYFarGl1hoVkkqauqBnRy4ySIDN3JUc3EfkFGT0BI0xVEAYpLGhxQDCDYKldOpKAqj/WI="
+ },
+ "signs_required": 1,
+ "title": "Antilibrary",
+ "zeronet_version": "0.5.7"
+}

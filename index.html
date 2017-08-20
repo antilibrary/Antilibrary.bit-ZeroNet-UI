@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Antilibrary</title>
+	<link rel="stylesheet" href="css/all.css">
+</head>
+<body class="bg-faded">
+	<div class="container">
+		<nav class="navbar navbar-light navbar-full bg-faded">
+			<a class="navbar-brand" href="#" id="home-link" onclick="Page.handleHomeClick()"><img src="images/antilibrary.png" style="width: 150px; margin-right: 20px" title="'I have always imagined that Paradise will be a kind of library.' - Jorge Luis Borges"></a>
+			<form class="form-inline pull-xs-left" onsubmit="return false;">
+				<div class="input-group">
+					<input class="form-control" type="text" v-bind:value="search_string" placeholder="Search books or authors - use % as wildcard"
+					id="search-string" style="margin-top: 4px; background-color: #f7f7f9">
+					<span class="input-group-btn">
+						<button class="btn btn-outline-secondary" type="button" onclick="Page.handleSearchClick()" id="submit-search" style="margin-top: 4px;">Search</button>
+					</span>
+				</div>
+			</form>
+			<ul class="nav navbar-nav pull-xs-right">
+				<li class="nav-item">
+					<a class="nav-link" href="#" onclick="Page.handleShelvesClick()" id="shelves-link">My Books</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="https://www.reddit.com/r/antilibrary/comments/6qcz27/wish_list/" target="_blank">Wish List</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="https://www.reddit.com/r/antilibrary/comments/6ow6tq/antilibrary_faq/" target="_blank" id="about-link">About</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="https://www.reddit.com/r/antilibrary/" id="discuss-link" target="_blank">Discuss</a>
+				</li>
+			</ul>
+		</nav>
+		<div class="alert alert-warning" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<strong>Issues with offline files</strong><br>
+			Antilibrary is currently unable to make offline ebooks available online.<br>
+			Book files that are online will stay online. Book files that are offline cannot be posted online for the time being.<br>
+			We're working to sort out this issue. You can help by <a href="https://www.reddit.com/r/antilibrary/comments/6qd4ak/donate_hard_drive_space/" target="_blank">donating hard drive space.</a>
+		</div>
+		<div v-bind:class="['alert', class_type]" role="alert" id="site_alert" v-if="visible == true">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<div v-html="msg"></div>
+		</div>
+		<div class="row" style="background-color: white; padding: 20px; min-height: 700px;">
+			<!-- SEARCH -->
+			<div class="col-md-12" id="search-container">
+				<div class="pull-md-right text-muted" style="margin-top: 10px" v-if="show_count">{{count}} books found</div>
+				<h1 class="display-4">{{search_header}}<small v-if="search_string"> {{search_string}}</small> <i class="fa fa-spinner fa-pulse fa-fw" v-if="show_loading"></i></h1>
+				<hr>
+				<div class="row">
+					<div v-bind:class="search_type == 'shelves' ? 'col-md-2' : 'hidden'">
+						<span class="text-muted">Shelves </span>
+						<br>
+						<div v-for="(shelf,index) in shelves">
+							<a href="#" v-bind:class="[active_shelf == index ? 'shelf-active': '','shelf-link']" v-bind:onclick="'Search.executeSearch(\'shelves\','+index+')'" v-if="shelf.books.length > 0">{{ shelf.name }} ({{ shelf.books.length }})</a>
+						</div>
+						<br>
+						<hr>
+						<span class="text-muted">Tools</span>
+						<br>
+						<a href="#" class="tool-link" onclick="User.handleToolsSettings(this)">Settings</a><br>
+						<a href="#" class="tool-link" onclick="User.handleToolsImport(this)">Import Goodreads</a>
+						<a href="#" class="tool-link" onclick="User.handleUploadBook(this)">Upload ebook</a>
+						<hr>
+						<br>
+						<small class="text-muted">Please note: <br>Any user is able to see which books you have in your shelves. This is required so that our backend system can work. (eg: indexing missing books, fulfilling file requests, etc)</small>
+					</div>
+					<div v-bind:class="search_type == 'shelves' ? 'col-md-10' : 'col-md-12'">
+						<div v-if="books.length > 0">
+							<div v-for="book in books">
+								<img v-if="book.i_u" v-bind:src="book.i_u" alt="cover" width="49" height="75" class="cover pull-md-left" style="margin-right: 10px">
+								<img v-else src="images/nocover.png" alt="cover" width="49" height="75" class="cover pull-md-left" style="margin-right: 10px">
+								<strong><a href="#" v-bind:onclick="'window.Book.showBook(' + book.b_id + ')'" data-toggle="modal" data-target="book-modal" class="ebook-link">{{ book.t }}</a></strong>
+								<br> by {{ book.authors_names }}
+								<br>
+								<small class="text-muted"><img v-bind:src="'images/' + book.l_c +'.png'" v-bind:title="get_language_name(book.l_c)"></small>
+								<small class="text-muted" style="margin-left: 5px">published <span v-if="book.p_y > 0"> {{ book.p_y }}</span> by {{ book.publisher_name }}</small>
+								<small class="text-muted" style="margin-left: 20px" v-if="book.a_r > 0">
+									rating <span style="color: gold">
+									<i class="fa fa-star" :class="{ 'fa-star': (book.a_r + 1 - n) >= .51, 'fa-star-o' : (book.a_r + 1 - n) < .51 }" aria-hidden="true" v-for="n in 5"></i>
+								</span>
+								{{book.a_r}}</small>
+								<small class="text-muted" style="margin-left: 20px" v-if="book.n_p">{{book.n_p}} pages</small>
+								<div class="clearfix"></div>
+								<hr>
+							</div>
+						</div>
+						<div v-if="no_results_found" v-html="nothing_found_error">
+						</div>
+						<div id="shelves-tools" class="hidden">
+							<div class="alert alert-warning" role="alert">
+								Before using this feature make sure you've downloaded all book databases first.<br>You can download the databases on the <strong>Settings</strong> menu on the left.
+							</div>
+							<h3>Import from Goodreads</h3>
+							<p>
+								Select your Goodreads shelves export file (goodreads_library_export.csv) to auto-add the books to your Antilibrary shelves.
+								<br> Note that books that are not found on Antilibrary will be added to a shelf named <em>Pending</em>.  <br><br> You can download your shelves export from the <a href="https://www.goodreads.com/review/import"
+								target="_blank">Goodreads export page</a>
+							</p>
+							<hr>
+							<div class="text-xs-center" v-if="import_progress_current_value > 1">{{import_progress_label}}</div>
+							<progress class="progress" v-bind:value="import_progress_current_value" v-bind:max="import_progress_max_value" aria-describedby="import-progress-bar" v-if="import_progress_current_value > 1"></progress>
+							<div class="form-group">
+								<label for="goodreadsExportFile">Select your goodreads_library_export.csv</label>
+								<input type="file" class="form-control-file" id="goodreadsExportFile">
+								<br>
+								<button type="submit" class="btn btn-primary" onclick="User.handleToolsImportAction()" v-bind:disabled="import_action_disabled">{{import_action_label}}</button>
+							</div>
+						</div>
+						<div id="upload-book" class="hidden">
+							<h3>Upload ebook <small>(experimental)</small></h3>
+							<br>
+							<div class="form-group">
+							    <label for="goodreads_id"><strong>Goodreads ID</strong></label>
+							    <input type="text" class="form-control" id="goodreads_id" aria-describedby="goodreads_id_help" style="width: 30%" placeholder="1922929">
+							    <small id="goodreads_id_help" class="text-muted">Open the book page on <a href="https://www.goodreads.com" target="_blank">goodreads.com</a> then copy and paste the number on the url. Example: goodreads.com/book/show/<strong style="color: red !important">1922929</strong>.The_Black_Swan</small>
+							</div>
+							<div class="form-group">
+								<label for="upload_filepath"><strong>IPFS Hash for the file</strong></label>
+								<input type="text" class="form-control" id="upload_ipfs_hash" aria-describedby="upload_ipfs_hash_help" style="width: 70%" placeholder="QmQEpC6abvJUH7miZkLds5SC3Hmsqx9LWb5z33DtWa6spH">
+							    <small id="upload_ipfs_hash_help" class="text-muted">Accepted files: {{ ebook_upload_accepted_files }}<br>
+							    Please, seed this file until the file status changes from 'pending' to something else.</small>
+							  </div>
+							<button type="submit" class="btn btn-primary" onclick="User.handleUploadBookAction()">Add ebook</button> <span id="upload_saved" class="hidden" style="color: green; font-size: 1.2em; margin-left: 15px"><strong>Added! <i class="fa fa-heart" aria-hidden="true" style="color: red"></i> Thank you! <i class="fa fa-heart" aria-hidden="true" style="color: red"></i></strong></span>
+							<br>
+							<br>
+							<hr>
+							<h3>Added ebooks</h3>
+							<table class="table table-striped" id="upload_added_files_list">
+							  <thead>
+							    <tr>
+							      <th>Goodreads ID</th>
+							      <th>IPFS Hash</th>
+							      <th>Status</th>
+							    </tr>
+							  </thead>
+							  <tbody>
+							    <tr v-for="added_book in upload_added_books">
+							      <th scope="row" v-html="window.searchResults.get_file_goodreads_link(added_book.goodreads_id)"></th>
+							      <td><code>{{ added_book.ipfs_hash }}</code></td>
+							      <td v-html="window.searchResults.get_file_status(added_book.file_status)"></td>
+							    </tr>
+							  </tbody>
+							</table>
+							<span v-if="upload_added_books.length == 0">You haven't added any ebook yet</span>
+							<br>
+							<br>
+							<hr>
+							<h3>FAQ</h3>
+							<p class="lead">
+								<strong>What is IPFS?</strong><br>
+								IPFS is a distributed file system where you can seed your file so Antilibrary is able to download it and add to our database. <br>
+								<a href="https://ipfs.io/docs/getting-started/" target="_blank">Learn more about IPFS</a> 
+								<br>
+								<br>
+								<strong>I've added a file but the status is still pending after 1h</strong><br>
+								New files may take up to 1h to process. Give it some time and if your file is still pending email me (zeromail: antilibrary@zeroid.bit).
+								<br>
+								<br>
+								<strong>How can I upload the book file using ZeroNet?</strong><br>
+								We don't yet support ebook uploads directly to ZeroNet. At this stage you will need to <a href="https://ipfs.io/docs/commands#ipfs-add" target="_blank">add your ebook file to IPFS</a>, enter your file ipfs hash above and seed the file until the file is downloaded and added to Antilibrary (the upload status should change to 'Added').<br>
+								Native file upload support will be added soon.
+								<br>
+								<br>
+								<strong>How can I add multiple files?</strong><br>
+								You can edit your user data file and add the list of files to the <code>uploads</code> list:</p>
+<pre><code>
+Your user data file path:
+{{data_file_path}}
+
+
+{
+    "settings": {},
+    "shelves": [...],
+    "requests": [...],
+<strong>
+    "uploads": [
+        {
+            "ipfs_hash": "IPFS_HASH_1",
+            "goodreads_id": "GOODREADS_ID_1",
+            "file_status": ""
+        },
+        {
+            "ipfs_hash": "IPFS_HASH_2",
+            "goodreads_id": "GOODREADS_ID_2",
+            "file_status": ""
+        }
+    ]
+</strong>
+}
+
+</code></pre>
+							<p class="lead">Once done, save the file and add a book to your shelves so that the saved file is published.
+
+							</p>
+						</div>
+						<div id="user-settings" class="hidden">
+							<h3>Settings</h3>
+							<br>
+							<h4>Book Databases</h4>
+							<p class="lead">Select the book databases you want to download. The databases contain only the books metadata, all book files are stored on IPFS.
+								<br>
+								Make sure you add one DB at a time and wait for the download to finish before adding a new one.</p>
+								<br>
+								<div id="book_dbs" v-for="hub of book_hubs">
+									<button v-bind:class="'btn btn-sm ' + hub.btn_class" style="margin-right: 10px" v-bind:onclick="'window.Page.addDB(\'' + hub.address + '\')'" v-html="hub.btn_label"></button><img v-bind:src="'images/' + hub.language_code + '.png'" style="margin-right: 10px"> {{ get_language_name(hub.language_code) }} - Non Fiction <span v-if="hub.language_code == 'en'" class="text-muted">(due to an <a href="https://github.com/HelloZeroNet/ZeroNet/issues/598" target="_blank">issue on ZeroNet</a> this DB can't be added through here. <a href="/1KrGwPRtnn77MsL35LBpNTEvvUhoLhmevq/" target="_blank">Click here to open the merger site (this DB) in a new tab</a> so the download will start. Once the download is completed refresh this page.)</span><br>
+								</div>
+								<hr>
+							</div>
+						</div>
+					</div>
+					<div class="text-xs-center" v-if="count > 0">
+						<nav aria-label="Page navigation">
+							<ul class="pagination">
+								<li class="page-item" v-if="offset > 0">
+									<a class="page-link" href="#" aria-label="Previous">
+										<span aria-hidden="true">&laquo;</span>
+										<span class="sr-only">Previous</span>
+									</a>
+								</li>
+								<li class="page-item" v-if="offset != null">
+									<a class="page-link" href="#" aria-label="Next" v-bind:onclick="'window.Search.executeSearch(\'latest\',\'\','+(offset+1)+')'">
+										<span aria-hidden="true">&raquo;</span>
+										<span class="sr-only">Next</span>
+									</a>
+								</li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+				<!-- ABOUT -->
+				<div class="col-md-12 invisible" id="about-container">
+					<h1 class="display-4">About</h1>
+                    <h3><a href="https://www.reddit.com/r/antilibrary/comments/6ow6tq/antilibrary_faq/" target="_blank">Antilibrary FAQ</a></h3>
+					<h3>Site Numbers</h3>
+					<p class="lead" id="project-stats">
+						<strong>Total books: {{ total_books }}</strong> (with a total of {{total_files}} files)
+						<br> Book files seeded: {{total_seeded}}
+						<br> Total seeded files size: {{total_size}}
+					</p>
+					<hr>
+					<blockquote class="blockquote">
+						<p class="lead">
+							<em>“The writer Umberto Eco belongs to that small class of scholars who are encyclopedic, insightful, and nondull. He is the owner of a large personal library (containing thirty thousand books), and separates visitors into two categories: those who react with “Wow! Signore, professore dottore Eco, what a library you have ! How many of these books have you read?” and the others - a very small minority - who get the point that a private library is not an ego-boosting appendage but a research tool. Read books are far less valuable than unread ones. The library should contain as much of what you don’t know as your financial means, mortgage rates and the currently tight real-estate market allows you to put there. You will accumulate more knowledge and more books as you grow older, and the growing number of unread books on the shelves will look at you menancingly. Indeed, the more you know, the larger the rows of unread books. <strong>Let us call this collection of unread books an antilibrary</strong>.”</em> - Nassim Nicholas Taleb, <a href="#" onclick="window.Search.executeSearch('keywords','The Black Swan: The Impact of the Highly Improbable')">The Black Swan: The Impact of the Highly Improbable</a>
+						</p>
+					</blockquote>
+					<br>
+                    <hr>
+					<p class="lead">
+						<a href="/Me.ZeroNetwork.bit/?Profile/1RedkCkVaXuVXrqCMpoXQS29bwaqsuFdL/1KN1Au7SRmeTmffcxxoyPABDpvqmq7iMbN/antilibrary@zeroid.bit">Antilibrary Zero Me</a>
+						<br> All books on this site come from the wonderful site libgen.io
+						<br> We are normalizing their collection as we copy it. This will take time but eventually we will have all libgen books seeded through IPFS.
+
+					</p>
+				</div>
+				<!-- END ABOUT -->
+			</div>
+			<!-- ROW -->
+		</div>
+		<!-- container -->
+		<!-- Modal template BEGIN-->
+		<div class="modal fade" id="book-modal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-body">
+
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-top: -15px; margin-right: -5px; position: static;">
+							<span aria-hidden="true" style="font-size: 1.5em">&times;</span>
+						</button>
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-md-8" style="margin-top: 25px">
+									<img v-if="book.i_u" v-bind:src="book.i_u" alt="cover" class="pull-md-left" style="margin-bottom: 10px; margin-right: 20px">
+									<img v-else src="images/nocover.png" alt="cover" class="pull-md-left" style="margin-bottom: 10px; margin-right: 20px">
+									<h5>
+										<strong>{{book.t}}</strong>
+										<br>
+										<small>by {{book.authors_names}}</small>
+									</h5>
+
+									<div v-if="book.d" v-html="book.d"></div>
+									<div v-else><em>No description available</em></div>
+								</div>
+								<div class="col-md-4">
+									<strong>Details</strong><br>
+									<small><strong>Rating:</strong> <span style="color: gold" v-if="book.a_r">
+										<i class="fa fa-star" :class="{ 'fa-star': (book.a_r + 1 - n) >= .51, 'fa-star-o' : (book.a_r + 1 - n) < .51 }" aria-hidden="true" v-for="n in 5"></i>
+									</span>
+									{{book.a_r? book.a_r : '-'}}</small><br>
+									<small><strong>Publication date </strong> {{book.month_name? book.month_name : '-'}} {{book.p_y? book.p_y : '-'}}</small><br>
+									<small><strong>Publisher:</strong> {{book.p? book.p : '-'}}</small><br>
+									<small><strong>Language:</strong> {{book.language}}</small><br>
+									<small><strong>Pages:</strong> {{book.n_p? book.n_p : '-'}}</small><br>
+									<small v-if="book.i10"><strong>ISBN:</strong> {{book.i10}}<br></small>
+									<small v-if="book.i13"><strong>ISBN13:</strong> {{book.i13}}<br></small>
+									<small v-if="book.asin"><strong>ASIN:</strong> {{book.asin}}<br></small>
+									<small><a v-bind:href="book.direct_link">Antilibrary Direct Link</a></small><br>
+									<small><a v-bind:href="book.goodreads_link" target="_blank">View on Goodreads <i class="fa fa-external-link" aria-hidden="true"></i></a></small><br>
+									<br>
+									<div style="margin-bottom: 10px"><strong>Actions</strong></div>
+									<div class="btn-group btn-block" >
+										<button type="button" v-bind:class="['btn', 'btn-block',getFirstShelf(book.b_id) ? 'btn-secondary' : 'btn-success']" style="width: 80%" v-bind:onclick="'User.handleAddToShelf(' + book.b_id + ',' + getFirstShelf(book.b_id,'index') + ',User.saveSettings)'">{{ getFirstShelf(book.b_id) ? getFirstShelf(book.b_id) : 'Want To Read'}}</button>
+										<button type="button" v-bind:class="['btn', 'dropdown-toggle','dropdown-toggle-split',getFirstShelf(book.b_id) ? 'btn-secondary' : 'btn-success']" data-toggle="dropdown" aria-haspopup="true"
+										aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></button>
+										<div class="dropdown-menu btn-block">
+											<a class="dropdown-item btn-sm" href="#" v-for="shelf in InShelf()" v-if="getFirstShelf(book.b_id) != shelf.name" v-bind:onclick="'User.handleAddToShelf('+book.b_id+','+ shelf.index +',User.saveSettings)'">{{shelf.name}}</a>
+											<!-- a class="dropdown-item btn-sm" href="#">Add Shelf</a -->
+										</div>
+									</div>
+									<a role="button" class="btn btn-secondary btn-block" v-bind:href="book.share_zerome_plus_link" target="_blank"><i class="fa fa-bullhorn" aria-hidden="true"></i> Share on ZeroMe+</a>
+									<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Close</button>
+									<br>
+									<div style="margin-bottom: 10px"><strong>Download</strong><i class="fa fa-spinner fa-pulse fa-fw" v-if="files_loading"></i> <small class="text-muted" v-if="files_loading == false">({{files.length}} file<span v-if="files.length > 1">s</span> found)</small></div>
+									<div v-if="files_loading == false">
+										<span v-if="files.length == 0">We don't have this book yet <i class="fa fa-frown-o" aria-hidden="true"></i></span>
+									</div>
+									<div v-for="file in files">
+										<button style="padding-left: 7px;" class="btn btn-block btn-secondary" v-if="!file.i_s"  v-bind:onclick="'User.handleRequestBook('+file.b_f_id+')'" v-bind:disabled="file.disabled" ><span v-bind:class="['tag', file.status_tag_class]"  data-toggle="tooltip" data-placement="top" title="This file is currently offline. You can request the file to be posted online. This may take up to 24h.">{{file.status_tag_label}}</span> Request {{file.ft.toUpperCase()}} ({{file.size}})</button>
+										<small style="font-weight: 400;color: orangered;">{{file.status_help_text}}</small>
+										<a role="button" style="padding-left: 7px;" class="btn btn-secondary btn-block" v-bind:href="'https://gateway.ipfs.io/ipfs/' +file.ipfs_link" v-if="file.i_s" target="_blank"><span v-bind:class="['tag', file.status_tag_class]" data-toggle="tooltip" data-placement="top" v-bind:title="'File is online. Seeded by: ' + file.seeders">{{file.status_tag_label}}</span> Download {{file.ft.toUpperCase()}} ({{file.size}})</a>
+										<small class="text-muted filename-block" v-if="file.i_s">Rename downloaded file to: <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Once you have downloaded the file, copy the filename below and paste it on the name of the downloaded file, including the extension."></i></small>
+										<div class="input-group"  v-if="file.i_s">
+											<input v-bind:id="file.ipfs_link" class="form-control form-control-sm" type="text" v-bind:value="file.filename" readonly>
+											<span class="input-group-btn ">
+												<button class="btn btn-sm form-control-sm btn-secondary" id="clippy" v-bind:data-clipboard-target="'#'+file.ipfs_link"><i class="fa fa-clipboard" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Copy and paste on the filename including the extension"></i></button>
+											</span>
+										</div>
+										<hr>
+									</div>
+									<small v-if="files.length > 0" ><strong class="text-muted">Download Troubleshooting</strong></small>
+									<button v-if="files.length > 0" type="button" class="btn btn-sm btn-link" data-container="body" data-toggle="popover" data-placement="top" data-html="true" data-trigger="focus" data-content="If the download button is not working try this:<br>- Right click the download button<br>- Choose 'Save Link As...' and save the file where you want<br><br>Don't forget to rename the file with the filename provided below the download button">
+										Download not working?
+									</button>
+									<button v-if="files.length > 0" type="button" class="btn btn-sm btn-link" data-container="body" data-toggle="popover" data-placement="top" data-html="true" data-trigger="focus" data-content="If you can see that one or more files exist but no download button is appearing, try this:<br>- Drag the zero that is on the top right to the left<br>- Click the 'Rebuild' button in the database section<br>- Once the rebuild process is done reload this page">
+										No download button appearing?
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal template END -->
+		<script type="text/javascript" src="js/all.js" defer></script>
+	</body>
+	</html>

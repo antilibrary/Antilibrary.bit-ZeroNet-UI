@@ -1,0 +1,17 @@
+.shelf-active {
+    font-weight: 700;
+}
+.hidden {
+    display: none;
+}
+#search-string:focus { 
+    background-color: white !important;
+}
+#search-string {
+    width: 400px !important;
+    transition: ease-in-out, width .35s ease-in-out !important;
+}
+
+#search-string:focus {
+    width: 580px !important;
+}

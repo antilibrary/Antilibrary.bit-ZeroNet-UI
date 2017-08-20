@@ -1,0 +1,99 @@
+{
+	"db_name": "Antilibrary",
+	"db_file": "merged-Antilibrary/antilibrary.db",
+	"version": 3,
+	"maps": {
+		".+/data/.+/book.json": {
+			"to_table": [ "book" ]
+		},
+		".+/data/.+/book_file.json": {
+			"to_table": [ "book_file" ]
+		},
+		".+/data/.+/book_metadata.json": {
+			"to_table": [ "book_metadata" ]
+		},
+		".+/data/.+/author.json": {
+			"to_table": [ "author" ]
+		},
+		".+/data/.+/book_by_author.json": {
+			"to_table": [ "book_by_author" ]
+		},
+		".+/data/.+/publisher.json": {
+			"to_table": [ "publisher" ]
+		}
+	},
+	"tables": {
+		"book": {
+			"cols": [
+				["b_id", "INTEGER"],
+				["t", "TEXT"],
+				["i10", "TEXT"],
+				["i13", "TEXT"],
+				["asin", "TEXT"],
+				["g_id", "INTEGER"],
+				["p_m", "INTEGER"],
+				["p_y", "INTEGER"],
+				["l_c", "TEXT"],
+				["p_id", "INTEGER"],
+				["gn", "TEXT"],
+				["json_id", "INTEGER REFERENCES json (json_id)"]
+			],
+		"indexes": ["CREATE UNIQUE INDEX book_key ON book(b_id, json_id)"],
+      	"schema_changed": 2
+		},
+		"author": {
+			"cols": [
+				["a_id", "INTEGER"],
+				["n", "TEXT"],
+				["g_id", "INTEGER"],
+				["json_id", "INTEGER REFERENCES json (json_id)"]
+			],
+		"indexes": ["CREATE UNIQUE INDEX author_key ON author(a_id, json_id)"],
+      	"schema_changed": 2
+		},
+		"book_by_author": {
+			"cols": [
+				["b_id", "INTEGER"],
+				["a_id", "INTEGER"],
+				["json_id", "INTEGER REFERENCES json (json_id)"]
+			],
+		"indexes": ["CREATE UNIQUE INDEX book_by_author_key ON book_by_author(b_id, a_id, json_id)"],
+      	"schema_changed": 2
+		},
+		"book_file": {
+			"cols": [
+				["b_f_id", "INTEGER"],
+				["b_id", "INTEGER"],
+				["md5", "TEXT"],
+				["i_h", "TEXT"],
+				["fs", "BIGINT"],
+				["ft", "TEXT"],
+				["i_s", "TEXT"],
+				["json_id", "INTEGER REFERENCES json (json_id)"]
+			],
+		"indexes": ["CREATE UNIQUE INDEX book_file_key ON book_file(b_f_id, json_id)"],
+      	"schema_changed": 3
+		},
+		"book_metadata": {
+			"cols": [
+				["b_id", "INTEGER"],
+				["d", "TEXT"],
+				["a_r", "FLOAT"],
+				["n_p", "INTEGER"],
+				["i_u", "TEXT"],
+				["json_id", "INTEGER REFERENCES json (json_id)"]
+			],
+		"indexes": ["CREATE UNIQUE INDEX book_metadata_key ON book_metadata(b_id, json_id)"],
+      	"schema_changed": 2
+		},
+		"publisher": {
+			"cols": [
+				["p_id", "INTEGER"],
+				["n", "TEXT"],
+				["json_id", "INTEGER REFERENCES json (json_id)"]
+			],
+		"indexes": ["CREATE UNIQUE INDEX publisher_key ON publisher(p_id, json_id)"],
+      	"schema_changed": 2
+		}
+	}
+}
