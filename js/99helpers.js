@@ -23,19 +23,24 @@ $(function () {
 })
 
 function convertSeedersHash(hash) {
-    if (hash == 'ma') {
-        return 'Antilibrary';
 
-    } else if (hash == 'jr') {
-        return 'jrp_seedbox';
+    hash = hash.replace("ma","Antilibrary");
+    hash = hash.replace("jr","jrp_seedbox");
+    hash = hash.replace("to","totoro");
+    hash = hash.replace("ky","kyle6492");
 
-    } else if (hash == 'to') {
-        return 'totoro';
+    hash = hash.replace("an","Anonymous");
+    hash = hash.replace("tr","Anonymous");
+    hash = hash.replace("my","Anonymous");
+    hash = hash.replace("al","Anonymous");//
+    hash = hash.replace("as","Anonymous");
+    hash = hash.replace("ty","Anonymous");
+    hash = hash.replace("kh","Anonymous");
+    hash = hash.replace("13","Anonymous");
+    hash = hash.replace("fe","Anonymous");
 
-    } else {
-        return 'Anonymous';
-
-    }
+    hash = hash.replace(/,/g,", ");
+    return hash;
 }
 
 //FIXME

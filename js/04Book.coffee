@@ -116,12 +116,6 @@ class Book extends Class
 
                     file.size = bytesToSize(file.fs)
 
-                    #fix issue when seeds == 0
-                    if file.i_s
-                        if file.i_s.length == 1
-                            file.i_s = false 
-
-
                     file.disabled = false
                     if !file.i_s
                         file.status_tag_label = "Offline"
@@ -137,7 +131,9 @@ class Book extends Class
                     else
                         file.status_tag_label = "Online"
                         file.status_tag_class = "tag-success"
-                        file.seeders = convertSeedersHash(file.i_s) 
+                        file.seeders = convertSeedersHash(file.i_s)
+                        if file.st
+                            file.holders = convertSeedersHash(file.st)
         
                     window.bookModal.files_loading = false
 

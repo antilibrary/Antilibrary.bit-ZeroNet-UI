@@ -8,8 +8,8 @@
    "size": 571167
   },
   "dbschema.json": {
-   "sha512": "c6908cc03314ec3e3e40812f064870789adf45404124830ca1b831c40b97da31",
-   "size": 2532
+   "sha512": "8e64c4636045f4fe7fff9afbe16e25546eaeae5c4f9b1778128108ff408663de",
+   "size": 2553
   },
   "images/antilibrary.png": {
    "sha512": "69b70b2246790685f4de5ebc897c2b7512bd8bd69560556f8d97a104bf065630",
@@ -48,25 +48,25 @@
    "size": 472
   },
   "index.html": {
-   "sha512": "268469c9b20bb7a9af36510638b3f2f1ba4607b32fb074b3c204d0d8a5367f38",
-   "size": 23598
+   "sha512": "f12339777475e7df6126ee9a929a5cbf7381ed628eb40986d54a55699858be96",
+   "size": 23681
   },
   "js/all.js": {
-   "sha512": "cd25b5fe696be9b949a90b83b527ffdcb8412b8aa1d7c979140deb7af2529b32",
-   "size": 350651
+   "sha512": "10bedad07879f6e207893575bc0e38c5806f1a6594f3f527db26fdaef099d523",
+   "size": 350999
   },
   "readme.md": {
-   "sha512": "6493b04860e0fefd9570c1d1d863e86f9ee0dfb908e383672801db27d3dbab88",
-   "size": 74
+   "sha512": "1322b9e964b12bc28824e57d431bccb3ad3660e1f879a1af0e746260354651bb",
+   "size": 75
   }
  },
  "ignore": "((js|css)/(?!all.(js|css))|.git|.idea|backend|merged-Antilibrary)",
  "inner_path": "content.json",
- "modified": 1502040243,
+ "modified": 1504071728,
  "postmessage_nonce_security": true,
  "signers_sign": "HJoc4uYl90bwNgKFDWEfxWw1ZKRKEFCuHZfE+H6YGiElG66QzJwK94mM3uZGQvqh4Bmtal9bhRtiSHYdx3UU2e0=",
  "signs": {
-  "147nKEb9bBJgBDgQytEQhmiGjF8e6HkEua": "G6yk7zY8biAbA3tbNpRYFarGl1hoVkkqauqBnRy4ySIDN3JUc3EfkFGT0BI0xVEAYpLGhxQDCDYKldOpKAqj/WI="
+  "147nKEb9bBJgBDgQytEQhmiGjF8e6HkEua": "GyMOdnWpJfleP4XOzgruLp7iLVVp0aWlnTUx+Oa9Ue6hYpaI3qgfny72EDLN79lvy67K7ooklBghTdZ9DhdC4Bk="
  },
  "signs_required": 1,
  "title": "Antilibrary",

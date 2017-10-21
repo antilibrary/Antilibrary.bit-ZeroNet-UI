@@ -69,6 +69,7 @@
 				["fs", "BIGINT"],
 				["ft", "TEXT"],
 				["i_s", "TEXT"],
+				["st", "TEXT"],
 				["json_id", "INTEGER REFERENCES json (json_id)"]
 			],
 		"indexes": ["CREATE UNIQUE INDEX book_file_key ON book_file(b_f_id, json_id)"],

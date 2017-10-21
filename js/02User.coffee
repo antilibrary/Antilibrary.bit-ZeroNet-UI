@@ -291,9 +291,9 @@ class User extends Class
                     @log "Book online:: #{book['b_f_id']}"
                     @request_list.push "<li>#{book['ft'].toUpperCase()} (#{bytesToSize(book.fs)}) for book <strong><a href=\"#\" onclick=\"window.Book.showBook(#{book['b_id']})\" data-toggle=\"modal\" data-target=\"book-modal\" class=\"ebook-link\">#{book['t']}</a></strong></li>"
 
-                    #remove b_f_id from 1KfmBBndyUFSWpbkboLU4epECraSbhqmudts
-                    index = @data.requests.indexOf book['b_f_id']
-                    @data.requests.splice index, 1 if index isnt -1
+                    #remove b_f_id
+                    index = @data.requests_posted.indexOf book['b_f_id']
+                    @data.requests_posted.splice index, 1 if index isnt -1
 
             else
                 @log "Book still offline! #{book['b_f_id']}"
@@ -306,11 +306,11 @@ class User extends Class
                 @saveSettings()
 
 
-        if @data.requests?
+        if @data.requests_posted?
             @request_list = []
-            @total_requests = @data.requests.length
+            @total_requests = @data.requests_posted.length
             @rct = 0
-            for b_f_id in @data.requests
+            for b_f_id in @data.requests_posted
                 @queryFile(b_f_id,requestPosted)
 
         @log "Checking requests...DONE!"
